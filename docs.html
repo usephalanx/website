@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docs — Self-Host Phalanx AI Engineering Team</title>
+  <meta name="description" content="How to install, configure, and run Phalanx on your own infrastructure. Docker Compose setup, environment variables, agent configuration, and production deploy guide.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta property="og:title" content="Docs — Self-Host Phalanx AI Engineering Team">
+  <meta property="og:description" content="Install, configure, and run Phalanx on your own infrastructure. Docker Compose, agent config, approval gates, and production deploy.">
+  <meta property="og:url" content="https://usephalanx.com/docs.html">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://usephalanx.com/social-card.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@usephalanx">
+  <meta name="twitter:title" content="Docs — Self-Host Phalanx AI Engineering Team">
+  <meta name="twitter:description" content="Install, configure, and run Phalanx on your own infrastructure.">
+  <meta name="twitter:image" content="https://usephalanx.com/social-card.svg">
+  <link rel="canonical" href="https://usephalanx.com/docs.html">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Phalanx Self-Hosting Documentation",
+      "description": "How to install, configure, and run Phalanx — the open-source multi-agent AI engineering team — on your own infrastructure.",
+      "url": "https://usephalanx.com/docs.html",
+      "publisher": { "@type": "Organization", "name": "Phalanx", "url": "https://usephalanx.com/" },
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Phalanx",
+        "applicationCategory": "DeveloperApplication"
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #050608;
+      --bg-elevated: #0B0D14;
+      --bg-card: #0F111A;
+      --bg-card-hover: #141725;
+      --border: #1A1D2E;
+      --border-hover: #272B45;
+      --text: #E4E8F1;
+      --text-secondary: #8891AB;
+      --text-muted: #555E78;
+      --blue: #7AA2F7;
+      --amber: #D4A853;
+      --build: #9ECE6A;
+      --qa: #73DACA;
+      --sec: #F7768E;
+      --rel: #FF9E64;
+      --plan: #BB9AF7;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --mono: 'JetBrains Mono', 'Menlo', monospace;
+      --max-w: 860px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: -1;
+      background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, black 30%, transparent 100%);
+    }
+    ::selection { background: rgba(122,162,247,0.3); }
+
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; border-bottom: 1px solid var(--border); background: rgba(5,6,8,0.92); backdrop-filter: blur(20px) saturate(180%); }
+    .nav-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+    .nav-mark { width: 30px; height: 30px; border-radius: 7px; background: linear-gradient(135deg, var(--blue), var(--plan)); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: #fff; }
+    .nav-wordmark { font-weight: 800; font-size: 17px; letter-spacing: 3px; text-transform: uppercase; }
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-gh { display: inline-flex; align-items: center; gap: 7px; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; background: var(--text); color: var(--bg); text-decoration: none; transition: all 0.2s; }
+    .nav-gh:hover { opacity: 0.88; }
+    .nav-gh svg { width: 15px; height: 15px; }
+
+    /* LAYOUT */
+    .docs-layout { display: grid; grid-template-columns: 220px 1fr; gap: 0; max-width: 1100px; margin: 0 auto; padding-top: 72px; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar { position: sticky; top: 72px; height: calc(100vh - 72px); overflow-y: auto; padding: 40px 24px 40px 24px; border-right: 1px solid var(--border); }
+    .sidebar-group { margin-bottom: 28px; }
+    .sidebar-group-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 10px; }
+    .sidebar-link { display: block; font-size: 13px; color: var(--text-secondary); text-decoration: none; padding: 5px 0; transition: color 0.2s; line-height: 1.4; }
+    .sidebar-link:hover, .sidebar-link.active { color: var(--blue); }
+
+    /* CONTENT */
+    .docs-content { padding: 48px 48px 80px; max-width: 680px; }
+
+    .page-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2.5px; color: var(--amber); margin-bottom: 14px; }
+    .page-title { font-size: clamp(28px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
+    .page-subtitle { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 48px; }
+
+    /* SECTION */
+    .doc-section { margin-bottom: 56px; }
+    .doc-section h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; padding-top: 8px; color: var(--text); }
+    .doc-section h3 { font-size: 15px; font-weight: 700; color: var(--text); margin: 24px 0 10px; }
+    .doc-section p { font-size: 15px; color: var(--text-secondary); line-height: 1.75; margin-bottom: 16px; }
+    .doc-section ul, .doc-section ol { padding-left: 20px; margin-bottom: 16px; }
+    .doc-section li { font-size: 15px; color: var(--text-secondary); line-height: 1.75; margin-bottom: 6px; }
+    .doc-section li strong { color: var(--text); }
+
+    /* CODE BLOCKS */
+    .code-block { background: #07090f; border: 1px solid rgba(122,162,247,0.12); border-radius: 10px; overflow: hidden; margin: 20px 0; }
+    .code-bar { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: #0d1018; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .cd-r { background: #FF5F57; } .cd-y { background: #FFBD2E; } .cd-g { background: #27C93F; }
+    .code-lang { flex: 1; text-align: center; font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.2); }
+    pre { padding: 20px; overflow-x: auto; }
+    code { font-family: var(--mono); font-size: 12.5px; line-height: 1.9; color: var(--text); white-space: pre; }
+    .c-comment { color: var(--text-muted); }
+    .c-key { color: var(--blue); }
+    .c-val { color: var(--build); }
+    .c-str { color: var(--qa); }
+    .c-cmd { color: var(--amber); }
+
+    /* INLINE CODE */
+    .inline-code { font-family: var(--mono); font-size: 12px; color: var(--text-secondary); background: var(--bg-elevated); padding: 2px 7px; border-radius: 4px; border: 1px solid var(--border); }
+
+    /* PREREQ TABLE */
+    .req-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+    .req-table th { text-align: left; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+    .req-table td { padding: 12px 14px; border: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; }
+    .req-table tr:hover td { background: var(--bg-card); }
+    .req-table td code { font-family: var(--mono); font-size: 12px; color: var(--build); }
+
+    /* AGENT TABLE */
+    .agent-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+    .agent-table th { text-align: left; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+    .agent-table td { padding: 12px 14px; border: 1px solid var(--border); color: var(--text-secondary); vertical-align: top; line-height: 1.5; }
+    .agent-table tr:hover td { background: var(--bg-card); }
+    .agent-name { font-weight: 700; color: var(--text); font-family: var(--mono); font-size: 13px; }
+    .agent-color { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+
+    /* CALLOUT */
+    .callout { display: flex; gap: 12px; padding: 14px 16px; border-radius: 8px; margin: 20px 0; font-size: 14px; line-height: 1.6; }
+    .callout-info { background: rgba(122,162,247,0.07); border: 1px solid rgba(122,162,247,0.2); color: var(--text-secondary); }
+    .callout-warn { background: rgba(212,168,83,0.07); border: 1px solid rgba(212,168,83,0.2); color: var(--text-secondary); }
+    .callout-icon { font-size: 16px; flex-shrink: 0; }
+
+    /* DIVIDER */
+    .doc-divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+    /* FOOTER */
+    footer { padding: 14px 20px; border-top: 1px solid var(--border); background: var(--bg-elevated); }
+    .footer-top { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr auto auto auto; gap: 48px; padding: 48px 24px 40px; }
+    .footer-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); font-weight: 700; font-size: 15px; margin-bottom: 12px; }
+    .footer-tagline { font-size: 13px; color: var(--text-muted); line-height: 1.6; max-width: 280px; margin-bottom: 20px; }
+    .footer-socials { display: flex; gap: 12px; }
+    .footer-socials a { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.2s; }
+    .footer-socials a:hover { border-color: var(--border-hover); color: var(--text); }
+    .footer-socials svg { width: 14px; height: 14px; }
+    .footer-col h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 16px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col a { font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: color 0.2s; }
+    .footer-col a:hover { color: var(--text); }
+    .footer-bottom { max-width: 1100px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); }
+    .footer-copy { font-size: 12px; color: var(--text-muted); }
+    .footer-legal { display: flex; gap: 20px; }
+    .footer-legal a { font-size: 12px; color: var(--text-muted); text-decoration: none; }
+    .footer-legal a:hover { color: var(--text); }
+
+    @media (max-width: 768px) {
+      .docs-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .docs-content { padding: 32px 24px 60px; }
+      .footer-top { grid-template-columns: 1fr; gap: 32px; padding: 32px 24px; }
+      .footer-bottom { flex-direction: column; gap: 12px; align-items: flex-start; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-mark">P</div>
+      <span class="nav-wordmark">Phalanx</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/#how">Use Cases</a></li>
+      <li><a href="/#formation">Agents</a></li>
+      <li><a href="/#deploy">Deploy</a></li>
+      <li><a href="/docs.html" style="color:var(--text);">Docs</a></li>
+      <li><a href="/changelog.html">Changelog</a></li>
+      <li><a href="https://github.com/usephalanx/phalanx" target="_blank" class="nav-gh">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="docs-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">Getting Started</div>
+      <a href="#overview" class="sidebar-link">Overview</a>
+      <a href="#prerequisites" class="sidebar-link">Prerequisites</a>
+      <a href="#quickstart" class="sidebar-link">Quick Start</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">Configuration</div>
+      <a href="#environment" class="sidebar-link">Environment Variables</a>
+      <a href="#agents" class="sidebar-link">Agent Configuration</a>
+      <a href="#approval-gates" class="sidebar-link">Approval Gates</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">The Pipeline</div>
+      <a href="#pipeline" class="sidebar-link">How the Pipeline Works</a>
+      <a href="#agent-roles" class="sidebar-link">Agent Roles</a>
+      <a href="#workflow-states" class="sidebar-link">Workflow States</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">Production</div>
+      <a href="#deploy" class="sidebar-link">Production Deploy</a>
+      <a href="#ci-webhooks" class="sidebar-link">CI Webhooks</a>
+      <a href="#demo-portal" class="sidebar-link">Demo Portal</a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="docs-content">
+
+    <p class="page-label">Documentation</p>
+    <h1 class="page-title">Self-Host Phalanx</h1>
+    <p class="page-subtitle">Everything you need to run Phalanx on your own infrastructure. Start with Docker Compose in under ten minutes.</p>
+
+    <!-- OVERVIEW -->
+    <div class="doc-section" id="overview">
+      <h2>Overview</h2>
+      <p>Phalanx is an open-source AI engineering team. You issue a work order — from Slack, the API, or the CLI — and a formation of specialized agents coordinates from planning to production. Each agent has a single mandate. No agent has unchecked authority. Humans approve the plan before code is written, the diff before merge, and the release before deploy.</p>
+      <p>The stack is Docker Compose: a FastAPI gateway, a Celery worker fleet, PostgreSQL with pgvector, and Redis. You own the infrastructure, the repos, and the secrets. No external service has access to your code.</p>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- PREREQUISITES -->
+    <div class="doc-section" id="prerequisites">
+      <h2>Prerequisites</h2>
+      <table class="req-table">
+        <thead><tr><th>Requirement</th><th>Version</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Docker</strong></td><td>24+</td><td>Docker Compose v2 required</td></tr>
+          <tr><td><strong>Python</strong></td><td>3.11+</td><td>For local dev and migrations</td></tr>
+          <tr><td><strong>Anthropic API key</strong></td><td>—</td><td>Used by Builder agent for code generation</td></tr>
+          <tr><td><strong>OpenAI API key</strong></td><td>—</td><td>Used by Commander, Planner, Reviewer (GPT-4.1)</td></tr>
+          <tr><td><strong>Slack app</strong></td><td>Socket mode</td><td>Required for Slack gateway; optional if using API</td></tr>
+          <tr><td><strong>GitHub token</strong></td><td>repo scope</td><td>Required for git push and PR creation</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-info">
+        <span class="callout-icon">ℹ</span>
+        <span>Slack is optional. You can trigger runs via the REST API at <span class="inline-code">POST /work-orders</span> without any Slack configuration.</span>
+      </div>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- QUICK START -->
+    <div class="doc-section" id="quickstart">
+      <h2>Quick Start</h2>
+      <p>Clone the repo, set your API keys, start infrastructure, run migrations, and start the gateway. The full pipeline is running in under ten minutes.</p>
+
+      <h3>1. Clone and configure</h3>
+      <div class="code-block">
+        <div class="code-bar"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div><span class="code-lang">bash</span></div>
+        <pre><code><span class="c-comment"># Clone</span>
+git clone https://github.com/usephalanx/phalanx.git
+cd phalanx
+
+<span class="c-comment"># Copy and fill in your keys</span>
+cp .env.example .env</code></pre>
+      </div>
+
+      <h3>2. Set required environment variables</h3>
+      <div class="code-block">
+        <div class="code-bar"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div><span class="code-lang">.env</span></div>
+        <pre><code><span class="c-comment"># LLM providers</span>
+<span class="c-key">ANTHROPIC_API_KEY</span>=<span class="c-str">sk-ant-...</span>        <span class="c-comment"># Builder agent</span>
+<span class="c-key">OPENAI_API_KEY</span>=<span class="c-str">sk-...</span>              <span class="c-comment"># Commander, Planner, Reviewer</span>
+
+<span class="c-comment"># Slack (optional — omit if using API only)</span>
+<span class="c-key">SLACK_BOT_TOKEN</span>=<span class="c-str">xoxb-...</span>
+<span class="c-key">SLACK_APP_TOKEN</span>=<span class="c-str">xapp-...</span>
+<span class="c-key">SLACK_CHANNEL_ID</span>=<span class="c-str">C0XXXXXXX</span>
+
+<span class="c-comment"># GitHub (required for git push + PR creation)</span>
+<span class="c-key">GITHUB_TOKEN</span>=<span class="c-str">ghp_...</span>
+
+<span class="c-comment"># Database (defaults work for local Docker Compose)</span>
+<span class="c-key">DATABASE_URL</span>=<span class="c-str">postgresql+asyncpg://phalanx:phalanx@localhost:5432/phalanx</span>
+<span class="c-key">REDIS_URL</span>=<span class="c-str">redis://localhost:6379/0</span></code></pre>
+      </div>
+
+      <h3>3. Start infrastructure and run migrations</h3>
+      <div class="code-block">
+        <div class="code-bar"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div><span class="code-lang">bash</span></div>
+        <pre><code><span class="c-comment"># Start Postgres and Redis</span>
+docker compose up postgres redis -d
+
+<span class="c-comment"># Install Python dependencies</span>
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev,qa]"
+
+<span class="c-comment"># Run database migrations</span>
+python -c "
+from alembic.config import Config; from alembic import command
+cfg = Config()
+cfg.set_main_option('script_location', 'alembic')
+cfg.set_main_option('sqlalchemy.url', 'postgresql+psycopg2://phalanx:phalanx@localhost:5432/phalanx')
+command.upgrade(cfg, 'head')
+"</code></pre>
+      </div>
+
+      <h3>4. Start the full stack</h3>
+      <div class="code-block">
+        <div class="code-bar"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div><span class="code-lang">bash</span></div>
+        <pre><code><span class="c-comment"># Start all services: gateway, worker, SRE worker, Postgres, Redis</span>
+docker compose up -d
+
+<span class="c-comment"># Check health</span>
+curl http://localhost:8000/health
+<span class="c-comment"># → {"status":"ok","db":"ok","redis":"ok"}</span></code></pre>
+      </div>
+
+      <h3>5. Send your first work order</h3>
+      <p>From Slack:</p>
+      <div class="code-block">
+        <div class="code-bar"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div><span class="code-lang">slack</span></div>
+        <pre><code>/phalanx build "Create a FastAPI app with a /health endpoint and pytest tests"</code></pre>
+      </div>
+      <p>Or via the REST API:</p>
+      <div class="code-block">
+        <div class="code-bar"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div><span class="code-lang">bash</span></div>
+        <pre><code>curl -X POST http://localhost:8000/work-orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Hello World FastAPI",
+    "description": "Create a FastAPI app with /health and /hello endpoints. Write pytest tests.",
+    "project_id": "my-project"
+  }'</code></pre>
+      </div>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- ENVIRONMENT -->
+    <div class="doc-section" id="environment">
+      <h2>Environment Variables</h2>
+      <table class="req-table">
+        <thead><tr><th>Variable</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>ANTHROPIC_API_KEY</code></td><td>Yes</td><td>Builder agent uses Claude for code generation</td></tr>
+          <tr><td><code>OPENAI_API_KEY</code></td><td>Yes</td><td>Commander, Planner, Reviewer use GPT-4.1</td></tr>
+          <tr><td><code>DATABASE_URL</code></td><td>Yes</td><td>Async SQLAlchemy URL (asyncpg driver)</td></tr>
+          <tr><td><code>REDIS_URL</code></td><td>Yes</td><td>Celery broker and result backend</td></tr>
+          <tr><td><code>GITHUB_TOKEN</code></td><td>Yes</td><td>git push and PR creation (repo scope)</td></tr>
+          <tr><td><code>SLACK_BOT_TOKEN</code></td><td>No</td><td>Slack bot token (xoxb-). Omit to disable Slack</td></tr>
+          <tr><td><code>SLACK_APP_TOKEN</code></td><td>No</td><td>Socket mode app token (xapp-)</td></tr>
+          <tr><td><code>SLACK_CHANNEL_ID</code></td><td>No</td><td>Channel for approval gate messages</td></tr>
+          <tr><td><code>GIT_WORKSPACE</code></td><td>No</td><td>Base path for workspaces. Default: <code>/tmp/forge-repos</code></td></tr>
+          <tr><td><code>PHALANX_WORKER</code></td><td>Worker only</td><td>Set to <code>1</code> in worker containers. Forces NullPool to prevent event-loop conflicts in Celery fork workers.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-warn">
+        <span class="callout-icon">⚠</span>
+        <span><strong>PHALANX_WORKER=1</strong> must be set on every Celery worker container. Without it, the SQLAlchemy connection pool binds to the first event loop created by <span class="inline-code">asyncio.run()</span> and all subsequent tasks fail with "Future attached to a different loop".</span>
+      </div>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- AGENT CONFIGURATION -->
+    <div class="doc-section" id="agents">
+      <h2>Agent Configuration</h2>
+      <p>Agent behavior is configured in YAML. No code changes required to adjust models, token budgets, skills, or approval gate behavior.</p>
+      <div class="code-block">
+        <div class="code-bar"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div><span class="code-lang">configs/team.yaml</span></div>
+        <pre><code><span class="c-key">agents</span>:
+  <span class="c-key">builder</span>:
+    <span class="c-key">model</span>: <span class="c-str">claude-sonnet-4-6</span>
+    <span class="c-key">max_tokens</span>: <span class="c-val">20000</span>
+    <span class="c-key">skills</span>:
+      - <span class="c-str">python</span>
+      - <span class="c-str">fastapi</span>
+      - <span class="c-str">pytest</span>
+      - <span class="c-str">react</span>
+      - <span class="c-str">typescript</span>
+  <span class="c-key">reviewer</span>:
+    <span class="c-key">model</span>: <span class="c-str">gpt-4.1</span>
+    <span class="c-key">max_tokens</span>: <span class="c-val">4096</span>
+
+<span class="c-key">approval_gates</span>:
+  <span class="c-key">plan</span>: <span class="c-val">true</span>       <span class="c-comment"># Require approval before building</span>
+  <span class="c-key">ship</span>: <span class="c-val">true</span>       <span class="c-comment"># Require approval before merge</span>
+  <span class="c-key">release</span>: <span class="c-val">true</span>    <span class="c-comment"># Require approval before deploy</span></code></pre>
+      </div>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- APPROVAL GATES -->
+    <div class="doc-section" id="approval-gates">
+      <h2>Approval Gates</h2>
+      <p>Three gates are built into every run. They are non-skippable in code — there is no flag or config that bypasses them once enabled.</p>
+      <ul>
+        <li><strong>Plan approval</strong> — posted to Slack before Commander dispatches any agent. You see every task, every file target, every dependency. Approve or reject the entire plan.</li>
+        <li><strong>Ship approval</strong> — posted after QA and Security complete. Shows code quality score, coverage delta, and security scan results. Approve to open the PR.</li>
+        <li><strong>Release approval</strong> — posted after the PR is created. Final sign-off before the tagged release and deploy. The run holds in <span class="inline-code">RELEASE_PREP</span> until explicitly approved.</li>
+      </ul>
+      <div class="callout callout-info">
+        <span class="callout-icon">ℹ</span>
+        <span>Gates can be set to <span class="inline-code">false</span> in <span class="inline-code">configs/team.yaml</span> for fully autonomous runs in trusted CI environments. The default is <span class="inline-code">true</span> for all three.</span>
+      </div>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- PIPELINE -->
+    <div class="doc-section" id="pipeline">
+      <h2>How the Pipeline Works</h2>
+      <p>Every work order follows the same deterministic path. State transitions are enforced by a 16-state machine — no agent can skip ahead or act out of sequence.</p>
+      <div class="code-block">
+        <div class="code-bar"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div><span class="code-lang">pipeline</span></div>
+        <pre><code>WorkOrder
+  ↓
+Commander → [Plan Approval?]
+  ↓
+Planner → task list with file targets + acceptance criteria
+  ↓
+Builder (parallel where dependencies allow)
+  ↓
+Reviewer → code quality score + inline comments
+  ↓
+QA → test suite run + coverage gate
+  ↓
+Security → static analysis + secret detection + dep audit
+  ↓
+[Ship Approval?]
+  ↓
+Release → PR opened + tagged
+  ↓
+[Release Approval?]
+  ↓
+SRE → Dockerfile + deploy → live demo URL</code></pre>
+      </div>
+      <p>Each stage runs as a Celery task on its own queue. The orchestrator polls for completion and gates on DB state — not in-memory signals. This means worker restarts never lose progress.</p>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- AGENT ROLES -->
+    <div class="doc-section" id="agent-roles">
+      <h2>Agent Roles</h2>
+      <table class="agent-table">
+        <thead><tr><th>Agent</th><th>Mandate</th><th>Model</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="agent-color" style="background:#7AA2F7"></span><span class="agent-name">Commander</span></td>
+            <td>Accepts work orders, drives the run end-to-end, manages state transitions and orchestrates handoffs between agents.</td>
+            <td>GPT-4.1</td>
+          </tr>
+          <tr>
+            <td><span class="agent-color" style="background:#BB9AF7"></span><span class="agent-name">Planner</span></td>
+            <td>Decomposes work into ordered tasks with file paths, function names, and test cases. Precise enough that the builder needs no interpretation.</td>
+            <td>GPT-4.1</td>
+          </tr>
+          <tr>
+            <td><span class="agent-color" style="background:#9ECE6A"></span><span class="agent-name">Builder</span></td>
+            <td>Writes code, creates files, commits to a feature branch. Each task gets a fresh or incremental isolated workspace. Generates QA.md for the QA agent on the final task.</td>
+            <td>Claude Sonnet 4.6</td>
+          </tr>
+          <tr>
+            <td><span class="agent-color" style="background:#E0AF68"></span><span class="agent-name">Reviewer</span></td>
+            <td>Reviews all commits for code quality, correctness, and adherence to project patterns. Scores and flags issues before QA. Verdict: APPROVED, CHANGES_REQUESTED, or CRITICAL_ISSUES.</td>
+            <td>GPT-4.1</td>
+          </tr>
+          <tr>
+            <td><span class="agent-color" style="background:#73DACA"></span><span class="agent-name">QA</span></td>
+            <td>Reads the QA.md recipe, installs dependencies, runs the test suite, measures coverage delta. Blocks the run if coverage drops below threshold.</td>
+            <td>GPT-4.1</td>
+          </tr>
+          <tr>
+            <td><span class="agent-color" style="background:#F7768E"></span><span class="agent-name">Security</span></td>
+            <td>Runs detect-secrets, bandit, pip-audit, and optional Trivy on every build. Blocks on any critical finding before code can be merged.</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><span class="agent-color" style="background:#FF9E64"></span><span class="agent-name">Release</span></td>
+            <td>Opens the PR, runs health checks, tags the release. The run waits in RELEASE_PREP until you explicitly approve the final merge.</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td><span class="agent-color" style="background:#7AA2F7"></span><span class="agent-name">SRE</span></td>
+            <td>After release, generates a production Dockerfile for the built app, builds and deploys it to the demo server, configures per-slug nginx routing. Every run results in a live URL at demo.usephalanx.com.</td>
+            <td>GPT-4.1</td>
+          </tr>
+          <tr>
+            <td><span class="agent-color" style="background:#F7768E"></span><span class="agent-name">CI Fixer</span></td>
+            <td>Triggered by CI webhook failures. Reads failure logs, diagnoses the root cause, writes a targeted fix, and opens a follow-up PR autonomously.</td>
+            <td>GPT-4.1</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- WORKFLOW STATES -->
+    <div class="doc-section" id="workflow-states">
+      <h2>Workflow States</h2>
+      <p>Every run follows a deterministic 16-state machine. Transitions are enforced in code — no run can skip a state or move backwards.</p>
+      <div class="code-block">
+        <div class="code-bar"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div><span class="code-lang">state machine</span></div>
+        <pre><code>INTAKE → RESEARCHING → PLANNING
+  → AWAITING_PLAN_APPROVAL → EXECUTING → VERIFYING
+  → AWAITING_SHIP_APPROVAL → READY_TO_MERGE → MERGED
+  → RELEASE_PREP → AWAITING_RELEASE_APPROVAL → SHIPPED
+
+Error states: FAILED · ESCALATING · CANCELLED · BLOCKED</code></pre>
+      </div>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- PRODUCTION DEPLOY -->
+    <div class="doc-section" id="deploy">
+      <h2>Production Deploy</h2>
+      <p>The deploy script builds <span class="inline-code">phalanx-api</span> and <span class="inline-code">phalanx-worker</span> images locally for <span class="inline-code">linux/amd64</span>, SCPs the tarballs to your server, loads them, runs DB migrations, and restarts all containers. No <span class="inline-code">docker build</span> runs on the server.</p>
+      <div class="code-block">
+        <div class="code-bar"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div><span class="code-lang">bash</span></div>
+        <pre><code><span class="c-comment"># Set server details</span>
+export DEPLOY_HOST="ubuntu@your-server-ip"
+export DEPLOY_KEY="~/.ssh/your-key.pem"
+
+<span class="c-comment"># Auto-bump patch version, build, and ship</span>
+./deploy.sh
+
+<span class="c-comment"># Explicit version</span>
+./deploy.sh v1.4.0
+
+<span class="c-comment"># Migrations only (no image rebuild)</span>
+./deploy.sh --migrate-only</code></pre>
+      </div>
+      <div class="callout callout-warn">
+        <span class="callout-icon">⚠</span>
+        <span>Set <span class="inline-code">PHALANX_WORKER=1</span> in your production worker container environment. See <a href="#environment" style="color:var(--blue)">Environment Variables</a> for why this is required.</span>
+      </div>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- CI WEBHOOKS -->
+    <div class="doc-section" id="ci-webhooks">
+      <h2>CI Webhooks</h2>
+      <p>Phalanx can receive failure webhooks from your CI provider. When a CI run fails, the CI fixer agent is dispatched automatically to diagnose and fix the failure.</p>
+      <h3>Supported providers</h3>
+      <ul>
+        <li>GitHub Actions — <span class="inline-code">POST /webhook/github</span></li>
+        <li>Buildkite — <span class="inline-code">POST /webhook/buildkite</span></li>
+        <li>CircleCI — <span class="inline-code">POST /webhook/circleci</span></li>
+        <li>Jenkins — <span class="inline-code">POST /webhook/jenkins</span></li>
+      </ul>
+      <h3>GitHub Actions setup</h3>
+      <div class="code-block">
+        <div class="code-bar"><div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div><span class="code-lang">.github/workflows/ci.yml</span></div>
+        <pre><code><span class="c-key">on</span>:
+  <span class="c-key">workflow_run</span>:
+    <span class="c-key">workflows</span>: [<span class="c-str">"CI"</span>]
+    <span class="c-key">types</span>: [<span class="c-str">completed</span>]
+
+<span class="c-key">jobs</span>:
+  <span class="c-key">notify-phalanx</span>:
+    <span class="c-key">if</span>: <span class="c-str">github.event.workflow_run.conclusion == 'failure'</span>
+    <span class="c-key">runs-on</span>: <span class="c-str">ubuntu-latest</span>
+    <span class="c-key">steps</span>:
+      - <span class="c-key">run</span>: |
+          curl -X POST https://your-phalanx.com/webhook/github \
+            -H "Content-Type: application/json" \
+            -d '{"run_id": "${{ github.event.workflow_run.id }}", "repo": "${{ github.repository }}"}'</code></pre>
+      </div>
+    </div>
+
+    <hr class="doc-divider">
+
+    <!-- DEMO PORTAL -->
+    <div class="doc-section" id="demo-portal">
+      <h2>Demo Portal</h2>
+      <p>Every completed run that reaches the SRE stage results in a live, containerized demo deployed to <span class="inline-code">demo.usephalanx.com/{slug}</span>. The demo portal lists all deployed apps with run metadata, stack info, and direct links.</p>
+      <p>Each demo container runs in an isolated Docker network with its own nginx routing block, auto-generated from the app's slug. Demos persist until manually removed or the demo server is cleaned up.</p>
+      <p>To browse demos built by Phalanx: <a href="https://demo.usephalanx.com" target="_blank" style="color:var(--blue);">demo.usephalanx.com</a></p>
+    </div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-top">
+    <div>
+      <a href="/" class="footer-brand">
+        <div class="nav-mark" style="width:24px;height:24px;font-size:11px;border-radius:6px;">P</div>
+        Phalanx
+      </a>
+      <p class="footer-tagline">Open-source AI engineering team. Specialized agents coordinate from planning to production — with human approval at every gate.</p>
+      <div class="footer-socials">
+        <a href="https://github.com/usephalanx/phalanx" target="_blank" title="GitHub" aria-label="GitHub">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        </a>
+        <a href="https://x.com/usephalanx" target="_blank" title="X" aria-label="X">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="/#how">Use Cases</a></li>
+        <li><a href="/#formation">The Agents</a></li>
+        <li><a href="/#control">Trust Model</a></li>
+        <li><a href="/#deploy">Deploy</a></li>
+        <li><a href="/#compare">Compare</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="https://github.com/usephalanx/phalanx" target="_blank">GitHub Repo</a></li>
+        <li><a href="https://github.com/usephalanx/showcase" target="_blank">Showcase</a></li>
+        <li><a href="/changelog.html">Changelog</a></li>
+        <li><a href="/docs.html">Docs</a></li>
+        <li><a href="https://github.com/usephalanx/phalanx/issues" target="_blank">Report an Issue</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Community</h4>
+      <ul>
+        <li><a href="https://github.com/usephalanx/phalanx" target="_blank">GitHub</a></li>
+        <li><a href="https://x.com/usephalanx" target="_blank">X / Twitter</a></li>
+        <li><a href="https://github.com/usephalanx/phalanx/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a></li>
+        <li><a href="https://github.com/usephalanx/phalanx/blob/main/LICENSE" target="_blank">MIT License</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">&copy; 2026 Phalanx. Open source under MIT License. &nbsp;<span style="font-family:var(--mono);color:var(--border-hover);">v1.3.82</span></span>
+    <div class="footer-legal">
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+      <a href="https://github.com/usephalanx/phalanx/security" target="_blank">Security</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
