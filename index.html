@@ -722,6 +722,18 @@
         <p>Use the same formation to verify the final state of a run before a release moves forward. Nothing ships without explicit sign-off.</p>
         <code>approve ship → approve release</code>
       </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <h3>CI Failure Recovery</h3>
+        <p>Connect your CI provider via webhook. When a build fails, the CI Fixer agent reads the logs, diagnoses the root cause, and opens a fix PR — without paging anyone.</p>
+        <code>POST /webhook/github</code>
+      </div>
+      <div class="step">
+        <div class="step-num">06</div>
+        <h3>Live Deploy</h3>
+        <p>After every successful run the SRE agent generates a Dockerfile, builds the image, and deploys it. You get a live URL at demo.usephalanx.com without touching infrastructure.</p>
+        <code>sre → live URL</code>
+      </div>
     </div>
   </div>
 </section>
@@ -747,6 +759,8 @@
       <div class="f-node" style="background:var(--sec);">S<span class="f-node-label">Security</span></div>
       <span class="f-arrow">&rarr;</span>
       <div class="f-node" style="background:var(--rel);">D<span class="f-node-label">Release</span></div>
+      <span class="f-arrow">&rarr;</span>
+      <div class="f-node" style="background:var(--blue);">S<span class="f-node-label">SRE</span></div>
     </div>
 
     <div class="agents-grid">
@@ -777,6 +791,14 @@
       <div class="agent" style="--agent-color:var(--rel);">
         <div class="agent-head"><div class="agent-icon" style="background:var(--rel);">D</div><span class="agent-name">Release</span></div>
         <p class="agent-desc">Opens the PR, tags the release, and runs health checks. The human approves the final merge — then it ships.</p>
+      </div>
+      <div class="agent" style="--agent-color:var(--blue);">
+        <div class="agent-head"><div class="agent-icon" style="background:var(--blue);">S</div><span class="agent-name">SRE</span></div>
+        <p class="agent-desc">Generates a production Dockerfile for the built app, deploys it to the demo server, and configures nginx routing. Every run results in a live URL.</p>
+      </div>
+      <div class="agent" style="--agent-color:var(--sec);">
+        <div class="agent-head"><div class="agent-icon" style="background:var(--sec);">CI</div><span class="agent-name">CI Fixer</span></div>
+        <p class="agent-desc">Triggered by CI webhook failures. Reads the logs, diagnoses the root cause, writes a targeted fix, and opens a follow-up PR — without human intervention.</p>
       </div>
     </div>
   </div>
@@ -1047,6 +1069,14 @@
       <details class="faq-item">
         <summary>What kind of work is the best fit first?</summary>
         <div class="faq-answer">Teams usually start with constrained, high-friction workflows: PR review, bug fixing, security verification, and release prep. Those paths make the value easier to prove than throwing an unconstrained backlog at the system on day one.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Can I see the apps Phalanx actually built?</summary>
+        <div class="faq-answer">Yes. Every completed run results in a live containerized demo deployed at demo.usephalanx.com. The SRE agent generates a Dockerfile, builds the image, and configures nginx routing automatically. You can browse all deployed apps at demo.usephalanx.com.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Does it fix broken CI builds automatically?</summary>
+        <div class="faq-answer">Yes, via the CI Fixer agent. Connect your CI provider (GitHub Actions, Buildkite, CircleCI, or Jenkins) with a webhook. When a build fails, Phalanx receives the event, reads the failure logs, diagnoses the root cause, and opens a fix PR — without anyone being paged.</div>
       </details>
     </div>
   </div>
