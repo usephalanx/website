@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Phalanx — Open-Source Multi-Agent AI Engineering Team</title>
-  <meta name="description" content="Phalanx is an open-source, self-hostable AI engineering team with 7 specialized agents, a 16-state workflow, and human approval gates from plan to release.">
+  <meta name="description" content="Phalanx is an open-source, self-hostable AI engineering team. Every CI fix is verified in an isolated sandbox before it touches your branch. 9 specialized agents, a 16-state workflow, and human approval gates from plan to release.">
   <meta name="robots" content="index,follow,max-image-preview:large">
   <meta property="og:title" content="Phalanx — Open-Source Multi-Agent AI Engineering Team">
-  <meta property="og:description" content="A self-hostable multi-agent coding system with 7 specialized agents, 16 workflow states, and human approval gates at every critical step.">
+  <meta property="og:description" content="A self-hostable multi-agent coding system with 9 specialized agents, 16 workflow states, and human approval gates at every critical step. Every CI fix re-runs in a sandbox before commit.">
   <meta property="og:url" content="https://usephalanx.com">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://usephalanx.com/social-card.svg">
@@ -406,6 +406,24 @@
     .bento-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
     .bento-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
 
+    /* Deploy section one-liner code block */
+    .deploy-snippet {
+      max-width: 760px;
+      margin: 0 auto 36px;
+      padding: 20px 22px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 13.5px;
+      line-height: 1.8;
+      color: var(--text);
+      overflow-x: auto;
+      white-space: pre;
+      text-align: left;
+    }
+    .deploy-snippet .ds-comment { color: var(--text-muted); }
+
     /* ── BUILT BY ── */
     .built-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
     .run-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.35); }
@@ -610,26 +628,26 @@
   </div>
 
   <h1>
-    <span class="line line-muted">Open-source multi-agent</span>
-    <span class="line line-accent">AI engineering team.</span>
+    <span class="line line-muted">The AI that re-runs your CI</span>
+    <span class="line line-accent">before it commits.</span>
   </h1>
 
   <p class="hero-sub">
-    Turn a Slack command into reviewed, tested, security-scanned code with human approval gates from plan to release. Self-host it on your own infrastructure and keep every run auditable.
+    Every fix is verified in an isolated sandbox against the exact failing command before it touches your branch. No guessing, no speculative patches. Open source, self-hostable, MIT.
   </p>
 
   <div class="hero-actions">
-    <a href="#deploy" class="btn btn-primary">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Deploy Community Edition
+    <a href="/scorecard.html" class="btn btn-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 6-6"/></svg>
+      See the scorecard
     </a>
-    <a href="#waitlist" class="btn btn-amber">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.09-1.08a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-      Get Early Access
-    </a>
-    <a href="https://github.com/usephalanx/phalanx" target="_blank" class="btn btn-ghost">
+    <a href="https://github.com/usephalanx/phalanx" target="_blank" class="btn btn-amber">
       <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
       View on GitHub
+    </a>
+    <a href="#waitlist" class="btn btn-ghost">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.09-1.08a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      Get Early Access
     </a>
   </div>
 
@@ -652,31 +670,51 @@
   </div>
 </section>
 
-<!-- METRICS -->
+<!-- METRICS — live from /scorecard.json (falls back to hardcoded values) -->
 <div class="metrics">
   <div class="metrics-inner">
     <div class="met-item">
-      <div class="met-num" style="color:var(--cmd)">7</div>
-      <div class="met-label">Specialized Agents</div>
-      <div class="met-sub">Each with a distinct role</div>
+      <div class="met-num" id="met-committed" style="color:var(--cmd)">20<span style="color:var(--text-muted);font-size:0.6em">/20</span></div>
+      <div class="met-label">PRs closed · all sandbox-verified</div>
+      <div class="met-sub">Every commit has a passing CI run before it ships</div>
     </div>
     <div class="met-item">
-      <div class="met-num" style="color:var(--plan)">16</div>
-      <div class="met-label">Workflow States</div>
-      <div class="met-sub">Deterministic, auditable</div>
+      <div class="met-num" id="met-langs" style="color:var(--plan)">5</div>
+      <div class="met-label">Language rows proven</div>
+      <div class="met-sub">Python · TS · JS · Java · C#</div>
     </div>
     <div class="met-item">
-      <div class="met-num" style="color:var(--amber)">3</div>
-      <div class="met-label">Human Approval Gates</div>
-      <div class="met-sub">Plan · Ship · Release</div>
+      <div class="met-num" id="met-avg" style="color:var(--amber)">$0.26</div>
+      <div class="met-label">Avg agent cost per fix</div>
+      <div class="met-sub">Real prod runs, recorded end-to-end</div>
     </div>
     <div class="met-item">
       <div class="met-num" style="color:var(--build)">$0</div>
-      <div class="met-label">License Cost</div>
+      <div class="met-label">License cost</div>
       <div class="met-sub">MIT · Self-hostable</div>
     </div>
   </div>
 </div>
+<script>
+  // Fetch the public scorecard so the numbers above update as new cells land.
+  // If the fetch fails (offline, CDN miss, etc.), the hardcoded defaults stay.
+  (async () => {
+    try {
+      const r = await fetch('/scorecard.json', { cache: 'no-store' });
+      if (!r.ok) return;
+      const s = (await r.json()).summary;
+      if (!s) return;
+      const fmt = (n) => typeof n === 'number' ? n : '—';
+      document.getElementById('met-committed').innerHTML =
+        `${s.committed}<span style="color:var(--text-muted);font-size:0.6em">/${s.total_cells}</span>`;
+      document.getElementById('met-langs').textContent = fmt(s.languages_complete);
+      document.getElementById('met-avg').textContent =
+        typeof s.avg_cost_per_cell_usd === 'number'
+          ? `$${s.avg_cost_per_cell_usd.toFixed(2)}`
+          : '—';
+    } catch (_) { /* fallback to hardcoded values */ }
+  })();
+</script>
 
 <!-- DEMO -->
 <div class="demo reveal" id="demo">
@@ -733,7 +771,7 @@
       <div class="step">
         <div class="step-num">06</div>
         <h3>Live Deploy</h3>
-        <p>After every successful run the SRE agent generates a Dockerfile, builds the image, and deploys it. You get a live URL at demo.usephalanx.com without touching infrastructure.</p>
+        <p>After every successful run the SRE agent generates a Dockerfile, builds the image, and deploys it on your own domain — no infra work, no handoff to another team.</p>
         <code>sre → live URL</code>
       </div>
     </div>
@@ -881,15 +919,12 @@
           <tr><th>Feature</th><th>Devin</th><th>Copilot Workspace</th><th>Factory</th><th>Phalanx</th></tr>
         </thead>
         <tbody>
+          <tr><td>Sandbox-verified before commit</td><td class="cx">&#10007;</td><td class="cx">&#10007;</td><td class="cx">&#10007;</td><td class="ck">&#10003; Re-runs the failing CI command</td></tr>
           <tr><td>Price</td><td>$500/mo</td><td>$19/seat/mo</td><td>$200/mo</td><td class="ck">Free (OSS)</td></tr>
           <tr><td>Open Source</td><td class="cx">&#10007;</td><td class="cx">&#10007;</td><td class="cx">&#10007;</td><td class="ck">&#10003;</td></tr>
           <tr><td>Self-Hostable</td><td class="cx">&#10007;</td><td class="cx">&#10007;</td><td class="cx">&#10007;</td><td class="ck">Docker</td></tr>
-          <tr><td>Specialized Agents</td><td>1 monolithic</td><td>1 (Copilot)</td><td>1 ("Droids")</td><td class="ck">7 distinct roles</td></tr>
           <tr><td>Human Approval Gates</td><td>PR review only</td><td>PR review only</td><td>PR review only</td><td class="ck">Plan + Ship + Release</td></tr>
-          <tr><td>Config-Driven</td><td class="cx">&#10007;</td><td class="cx">&#10007;</td><td>Limited</td><td class="ck">Full YAML</td></tr>
-          <tr><td>Deterministic State Machine</td><td class="cx">&#10007;</td><td class="cx">&#10007;</td><td class="cx">&#10007;</td><td class="ck">16-state workflow</td></tr>
-          <tr><td>Security Scan Agent</td><td class="cx">&#10007;</td><td class="cx">&#10007;</td><td class="cx">&#10007;</td><td class="ck">&#10003; Blocks on critical</td></tr>
-          <tr><td>Project Memory</td><td class="ck">&#10003;</td><td class="cx">&#10007;</td><td class="ck">&#10003;</td><td class="ck">pgvector</td></tr>
+          <tr><td>Managed cloud</td><td class="ck">&#10003;</td><td class="ck">&#10003;</td><td class="ck">&#10003;</td><td>Coming soon</td></tr>
         </tbody>
       </table>
     </div>
@@ -900,51 +935,43 @@
 <section id="deploy" style="background:var(--bg-elevated);">
   <div class="container reveal">
     <p class="label">Deploy Your Way</p>
-    <h2 class="title">Run Phalanx where your team<br>already works and ships.</h2>
-    <p class="subtitle">The point is not just autonomy. It is autonomy that fits your infrastructure, your repos, and your approval process without turning into another black box you have to trust blindly.</p>
-    <div class="bento">
+    <h2 class="title">Self-host it in your own<br>infrastructure, in minutes.</h2>
+    <p class="subtitle">No hosted black box. Phalanx runs on the same Docker Compose stack your team already knows, close to your repos, secrets, and approval flow.</p>
+
+    <pre class="deploy-snippet" aria-label="One-liner install"><span class="ds-comment"># clone, copy env template, start</span>
+git clone https://github.com/usephalanx/phalanx.git
+cd phalanx &amp;&amp; cp .env.example .env
+docker compose up -d</pre>
+
+    <div class="bento" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); max-width: 900px; margin: 0 auto;">
       <div class="bento-card">
         <div class="bento-icon" style="background:var(--blue-dim);">
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" width="20" height="20"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         </div>
-        <h3>Docker Compose</h3>
-        <p>Start with a self-hosted deployment path that feels familiar to engineering teams already running internal tooling.</p>
-      </div>
-      <div class="bento-card">
-        <div class="bento-icon" style="background:var(--amber-dim);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" width="20" height="20"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <h3>Private Infrastructure</h3>
-        <p>Keep the system close to your code, your data, and your policies instead of depending on a hosted black box to make engineering decisions.</p>
+        <h3>Your infra, your rules</h3>
+        <p>The system lives next to your code. Secrets, logs, and review history stay on your boxes, not a vendor's.</p>
       </div>
       <div class="bento-card">
         <div class="bento-icon" style="background:rgba(158,206,106,0.1);">
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--build)" stroke-width="2" width="20" height="20"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
         </div>
-        <h3>YAML Formations</h3>
-        <p>Define agent roles, skill boundaries, and approval gates in configuration instead of hard-coding one workflow forever.</p>
-      </div>
-      <div class="bento-card">
-        <div class="bento-icon" style="background:rgba(187,154,247,0.1);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--plan)" stroke-width="2" width="20" height="20"><ellipse cx="12" cy="12" rx="10" ry="4"/><path d="M2 12c0 2.21 4.477 4 10 4s10-1.79 10-4M2 12v6c0 2.21 4.477 4 10 4s10-1.79 10-4v-6"/></svg>
-        </div>
-        <h3>Project Memory</h3>
-        <p>Carry forward prior runs, decisions, and context so every new task is not starting from a blank prompt and a guess.</p>
-      </div>
-      <div class="bento-card">
-        <div class="bento-icon" style="background:rgba(247,118,142,0.1);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2" width="20" height="20"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        </div>
-        <h3>Security by Default</h3>
-        <p>Use a dedicated security role that can block risky output instead of hoping a general coding agent remembers to be careful.</p>
+        <h3>YAML formations</h3>
+        <p>Agents, skills, and approval gates are defined in config — not hard-coded behavior. Fork the YAML, don't fork the repo.</p>
       </div>
       <div class="bento-card">
         <div class="bento-icon" style="background:rgba(255,158,100,0.1);">
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--rel)" stroke-width="2" width="20" height="20"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
         </div>
-        <h3>Slack + GitHub Workflow</h3>
-        <p>Work where engineering teams already operate: dispatch from Slack, review in GitHub, and keep the run traceable end to end.</p>
+        <h3>Slack &#43; GitHub</h3>
+        <p>Dispatch from Slack, approve in-thread, review in a real PR. No new console to learn.</p>
       </div>
+    </div>
+
+    <div style="text-align:center;margin-top:36px;">
+      <a href="https://github.com/usephalanx/phalanx#quick-start" target="_blank" class="btn btn-ghost" style="display:inline-flex;align-items:center;gap:8px;">
+        Full install guide on GitHub
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
     </div>
   </div>
 </section>
@@ -1073,8 +1100,8 @@
         <div class="faq-answer">Teams usually start with constrained, high-friction workflows: PR review, bug fixing, security verification, and release prep. Those paths make the value easier to prove than throwing an unconstrained backlog at the system on day one.</div>
       </details>
       <details class="faq-item">
-        <summary>Can I see the apps Phalanx actually built?</summary>
-        <div class="faq-answer">Yes. Every completed run results in a live containerized demo deployed at demo.usephalanx.com. The SRE agent generates a Dockerfile, builds the image, and configures nginx routing automatically. You can browse all deployed apps at demo.usephalanx.com.</div>
+        <summary>Can I see the work Phalanx actually does?</summary>
+        <div class="faq-answer">Yes — the <a href="/scorecard.html">public scorecard</a> lists every PR our CI Fixer agent has closed in the simulation corpus, with the failing command, agent plan, sandbox verification, and GitHub commit SHA for each. For app-build runs, every completed run produces a live containerized deploy on a subdomain you control — the SRE agent generates the Dockerfile, builds the image, and configures routing.</div>
       </details>
       <details class="faq-item">
         <summary>Does it fix broken CI builds automatically?</summary>
