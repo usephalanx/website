@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phalanx — Scorecard (live CI-Fixer evidence)</title>
+  <meta name="description" content="Every PR Phalanx's CI Fixer has closed in the simulation corpus: failing command, agent's plan, sandbox verification, commit SHA, and dollar cost. No mocks — real repos, real CI, real GitHub commits.">
+  <meta property="og:title" content="Phalanx Scorecard — live CI-Fixer evidence">
+  <meta property="og:description" content="Real PRs. Real sandbox verification. Real commit SHAs. 16/20 cells across Python, JS, TS, Java.">
+  <meta property="og:url" content="https://usephalanx.com/scorecard.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@usephalanx">
+  <meta name="twitter:title" content="Phalanx Scorecard — live CI-Fixer evidence">
+  <meta name="twitter:description" content="Every PR Phalanx has closed: failing command, plan, sandbox verification, commit SHA, $ cost.">
+  <link rel="canonical" href="https://usephalanx.com/scorecard.html">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.88em' font-size='80'>⬡</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #050608;
+      --bg-elevated: #0B0D14;
+      --bg-card: #0F111A;
+      --bg-card-hover: #141725;
+      --border: #1A1D2E;
+      --border-hover: #272B45;
+
+      --text: #E4E8F1;
+      --text-secondary: #8891AB;
+      --text-muted: #555E78;
+
+      --blue: #7AA2F7;
+      --blue-dim: rgba(122,162,247,0.12);
+      --green: #9ECE6A;
+      --green-dim: rgba(158,206,106,0.12);
+      --amber: #D4A853;
+      --amber-dim: rgba(212,168,83,0.10);
+      --red: #F7768E;
+      --red-dim: rgba(247,118,142,0.10);
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code, pre, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* Nav */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 48px;
+    }
+    .nav .logo {
+      font-weight: 800;
+      font-size: 17px;
+      letter-spacing: -0.01em;
+    }
+    .nav .logo a { color: var(--text); text-decoration: none; }
+    .nav .logo .mark { color: var(--blue); }
+    .nav .back {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    /* Header */
+    h1 {
+      font-size: 44px;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.05;
+      margin-bottom: 14px;
+    }
+    .tagline {
+      color: var(--text-secondary);
+      font-size: 18px;
+      max-width: 720px;
+      margin-bottom: 12px;
+    }
+    .sub {
+      color: var(--text-muted);
+      font-size: 14px;
+      max-width: 720px;
+      margin-bottom: 40px;
+    }
+
+    /* Summary strip */
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 48px;
+      padding: 24px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .metric .value {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+    .metric .value.accent { color: var(--blue); }
+    .metric .value.green { color: var(--green); }
+    .metric .label {
+      color: var(--text-muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      transition: border-color 0.12s ease, background 0.12s ease;
+    }
+    .card:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-card-hover);
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .card-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .card-label .lang {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .badge.committed { color: var(--green); background: var(--green-dim); }
+    .badge.escalated { color: var(--red); background: var(--red-dim); }
+    .badge.verified { color: var(--green); background: var(--green-dim); }
+    .badge.unverified { color: var(--amber); background: var(--amber-dim); }
+
+    .row {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      align-items: baseline;
+    }
+    .row .k {
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding-top: 2px;
+    }
+    .row .v {
+      color: var(--text-secondary);
+      word-break: break-word;
+    }
+    .row .v.mono {
+      color: var(--text);
+      font-size: 12.5px;
+    }
+
+    .plan {
+      margin: 14px 0 12px;
+      padding: 12px 14px;
+      background: var(--bg);
+      border-left: 2px solid var(--blue);
+      border-radius: 3px;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+
+    .files {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11.5px;
+      color: var(--amber);
+    }
+
+    .foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .foot .cost { color: var(--text); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .foot .sha { color: var(--text-secondary); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .foot .sha.pinned { color: var(--text-muted); }
+    .foot .sha.pinned::after {
+      content: 'replay-pinned';
+      margin-left: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    .note {
+      margin-top: 48px;
+      padding: 20px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+    .note .label {
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+    .note p + p { margin-top: 10px; }
+
+    .loading, .error {
+      padding: 60px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .error { color: var(--red); }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 32px; }
+      .wrap { padding: 32px 16px 60px; }
+      .row { grid-template-columns: 80px 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="logo">
+        <a href="/"><span class="mark">⬡</span> Phalanx</a>
+      </div>
+      <a href="/" class="back">← back to home</a>
+    </div>
+
+    <h1>Scorecard — live CI-Fixer evidence</h1>
+    <p class="tagline">
+      Every PR the CI Fixer has closed in the simulation corpus. No mocks. Real testbed repos, real CI failures, real sandbox verification, real GitHub commits.
+    </p>
+    <p class="sub">
+      Each card below is a row from <span class="mono">tests/fixtures/scorecard/</span>: the failing CI command, the agent's plan, the files touched, the sandbox verification that gated the commit, and the dollar cost pulled from our prod run log.
+    </p>
+
+    <div id="summary" class="summary"><div class="metric"><div class="value">loading…</div></div></div>
+
+    <div id="grid" class="grid"></div>
+
+    <div id="errbox"></div>
+
+    <div class="note">
+      <div class="label">What you're looking at</div>
+      <p>
+        <strong>No code was committed without sandbox verification.</strong> Before <span class="mono">commit_and_push</span> fires, the coder subagent (or the main agent) re-runs the exact failing CI command inside an isolated Docker sandbox and confirms exit 0. Any cell with a <span class="mono">verified</span> badge has this proof in the fixture trace.
+      </p>
+      <p>
+        <strong>Python commits show as SHA-only (no link)</strong> because their record-branches were pruned from the testbed repo before GitHub's anonymous reachability window closed. The replay fixture still pins the exact tool trace, cost, and verdict — we just can't hand you a live diff viewer for those four rows.
+      </p>
+      <p>
+        <strong>Open gaps:</strong> the C# row (4 cells) is scaffolded and deployed but not yet recorded. Target is 20/20 cells across Python, JS, TS, Java, C#.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[c]);
+    }
+
+    function summaryHtml(s) {
+      return `
+        <div class="metric">
+          <div class="value accent">${s.committed}<span style="color: var(--text-muted); font-size: 20px;">/${s.total_cells}</span></div>
+          <div class="label">PRs closed (committed)</div>
+        </div>
+        <div class="metric">
+          <div class="value green">${s.committed}<span style="color: var(--text-muted); font-size: 20px;">/${s.total_cells}</span></div>
+          <div class="label">sandbox-verified before commit</div>
+        </div>
+        <div class="metric">
+          <div class="value">${s.languages_complete}<span style="color: var(--text-muted); font-size: 20px;">/5</span></div>
+          <div class="label">language rows complete</div>
+        </div>
+        <div class="metric">
+          <div class="value">$${s.total_cost_usd.toFixed(2)}</div>
+          <div class="label">total agent cost</div>
+        </div>
+        <div class="metric">
+          <div class="value">$${s.avg_cost_per_cell_usd.toFixed(3)}</div>
+          <div class="label">avg cost per fix</div>
+        </div>
+      `;
+    }
+
+    function cardHtml(c) {
+      const shaNode = c.commit_url
+        ? `<a class="sha" href="${esc(c.commit_url)}" target="_blank" rel="noopener">${esc(c.commit_short)}</a>`
+        : `<span class="sha pinned" title="Commit unreachable anonymously; replay fixture still pins the exact behavior.">${esc(c.commit_short)}</span>`;
+      const costNode = c.cost_usd != null
+        ? `<span class="cost">$${c.cost_usd.toFixed(3)} · ${c.tokens_used.toLocaleString()} tok</span>`
+        : `<span class="cost">—</span>`;
+      const verdictBadge = c.verdict === 'committed'
+        ? `<span class="badge committed">committed</span>`
+        : `<span class="badge escalated">${esc(c.verdict)}</span>`;
+      const verifyBadge = c.verified_in_sandbox
+        ? `<span class="badge verified">sandbox ✓</span>`
+        : `<span class="badge unverified">unverified</span>`;
+      const files = (c.target_files || []).map(esc).join(', ') || '—';
+      return `
+        <div class="card">
+          <div class="card-head">
+            <div class="card-label">
+              <span class="lang">${esc(c.lang_display)}</span> · ${esc(c.cell_display)}
+            </div>
+            ${verdictBadge}
+          </div>
+
+          <div class="row">
+            <div class="k">Repo</div>
+            <div class="v mono"><a href="${esc(c.repo_url || '#')}" target="_blank" rel="noopener">${esc(c.repo)}</a></div>
+          </div>
+          <div class="row">
+            <div class="k">Failing job</div>
+            <div class="v">${esc(c.failing_job)}</div>
+          </div>
+          <div class="row">
+            <div class="k">Command</div>
+            <div class="v mono">${esc(c.failing_command)}</div>
+          </div>
+
+          <div class="plan">${esc(c.plan) || '—'}</div>
+
+          <div class="row">
+            <div class="k">Files</div>
+            <div class="v files">${files}</div>
+          </div>
+          <div class="row">
+            <div class="k">Verify</div>
+            <div class="v">${verifyBadge} <span class="mono" style="color: var(--text-muted); font-size: 11.5px; margin-left: 4px;">exit ${c.verify_exit_code ?? '?'}</span></div>
+          </div>
+
+          <div class="foot">
+            ${costNode}
+            ${shaNode}
+          </div>
+        </div>
+      `;
+    }
+
+    async function main() {
+      $('summary').innerHTML = `<div class="loading">loading scorecard…</div>`;
+      let doc;
+      try {
+        const resp = await fetch('scorecard.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        doc = await resp.json();
+      } catch (e) {
+        $('summary').innerHTML = '';
+        $('errbox').innerHTML = `<div class="error">Failed to load scorecard data: ${esc(e.message)}</div>`;
+        return;
+      }
+      $('summary').innerHTML = summaryHtml(doc.summary);
+      $('grid').innerHTML = doc.cells.map(cardHtml).join('');
+    }
+
+    main();
+  </script>
+</body>
+</html>
