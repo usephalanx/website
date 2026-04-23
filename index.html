@@ -311,6 +311,97 @@
     .demo-title { flex:1; text-align:center; font-size:12px; color:var(--text-muted); font-family:var(--mono); }
     .demo-window video { display: block; width: 100%; height: auto; }
 
+    /* ── SCORECARD PREVIEW (replaces old demo.mp4 mockup — real fixture data) ── */
+    .sc-preview { padding: 100px 24px 40px; }
+    .sc-preview-head { text-align: center; margin-bottom: 36px; }
+    .sc-preview-head .label {
+      display: inline-flex; align-items: center; gap: 8px; justify-content: center;
+    }
+    .sc-live-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--build);
+      box-shadow: 0 0 0 0 rgba(158,206,106,0.6);
+      animation: sc-pulse 2s infinite;
+    }
+    @keyframes sc-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(158,206,106,0.55); }
+      70%  { box-shadow: 0 0 0 10px rgba(158,206,106,0); }
+      100% { box-shadow: 0 0 0 0 rgba(158,206,106,0); }
+    }
+    .sc-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      max-width: var(--max-w);
+      margin: 0 auto;
+    }
+    .sc-preview-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex; flex-direction: column;
+      transition: border-color 0.15s, background 0.15s, transform 0.15s;
+    }
+    .sc-preview-card:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-card-hover);
+      transform: translateY(-2px);
+    }
+    .sc-pc-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .sc-pc-label { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+    .sc-pc-label .lang { color: var(--text-muted); font-weight: 500; }
+    .sc-pc-badge {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 10.5px; font-weight: 600;
+      padding: 3px 7px; border-radius: 4px;
+      text-transform: uppercase; letter-spacing: 0.03em;
+      color: var(--build); background: rgba(158,206,106,0.12);
+    }
+    .sc-pc-row {
+      font-size: 12px; color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .sc-pc-row .k {
+      text-transform: uppercase; letter-spacing: 0.05em;
+      font-size: 10.5px; margin-right: 8px;
+    }
+    .sc-pc-row .v {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      color: var(--text-secondary);
+    }
+    .sc-pc-plan {
+      font-size: 12.5px; color: var(--text-secondary); line-height: 1.55;
+      margin: 12px 0;
+      padding: 10px 12px;
+      background: var(--bg);
+      border-left: 2px solid var(--blue);
+      border-radius: 3px;
+    }
+    .sc-pc-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: auto; padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11.5px;
+    }
+    .sc-pc-cost { color: var(--text); }
+    .sc-pc-sha { color: var(--blue); text-decoration: none; }
+    .sc-pc-sha:hover { text-decoration: underline; }
+    .sc-preview-cta { text-align: center; margin-top: 32px; }
+    .sc-preview-cta .btn { display: inline-flex; align-items: center; gap: 8px; }
+    .sc-preview-loading, .sc-preview-error {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px 0;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .sc-preview-error { color: var(--red); }
+
     /* ── SECTIONS ── */
     section { padding: var(--gap) 24px; }
     .container { max-width: var(--max-w); margin: 0 auto; }
@@ -543,6 +634,7 @@
       .bento { grid-template-columns: repeat(2,1fr); }
       .gates-grid { grid-template-columns: 1fr; }
       .built-grid { grid-template-columns: 1fr; }
+      .sc-preview-grid { grid-template-columns: 1fr; }
       .metrics-inner { grid-template-columns: repeat(2,1fr); row-gap: 40px; }
       .met-item { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 32px; }
       .met-item:nth-child(odd) { border-right: 1px solid var(--border); }
@@ -714,22 +806,73 @@
           : '—';
     } catch (_) { /* fallback to hardcoded values */ }
   })();
+
+  // Render 3 real scorecard cells below the hero — one per language (excluding
+  // Python, whose commit links are 404 per the replay-pinned fixture note).
+  // Deterministic pick = first live-link lint/test_fail/coverage from 3 distinct langs.
+  (async () => {
+    const grid = document.getElementById('scPreviewGrid');
+    if (!grid) return;
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+    try {
+      const r = await fetch('/scorecard.json', { cache: 'no-store' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const cells = (await r.json()).cells || [];
+      // Prefer visible breadth: one cell per lang, live-link only, first N distinct langs.
+      const picked = [];
+      const usedLangs = new Set();
+      for (const c of cells) {
+        if (!c.commit_public || !c.commit_url) continue;
+        if (usedLangs.has(c.lang)) continue;
+        picked.push(c);
+        usedLangs.add(c.lang);
+        if (picked.length === 3) break;
+      }
+      if (picked.length === 0) throw new Error('no linkable cells');
+      grid.innerHTML = picked.map(c => {
+        const cost = typeof c.cost_usd === 'number' ? `$${c.cost_usd.toFixed(3)}` : '—';
+        const tokens = typeof c.tokens_used === 'number' ? `· ${c.tokens_used.toLocaleString()} tok` : '';
+        return `
+          <div class="sc-preview-card">
+            <div class="sc-pc-head">
+              <div class="sc-pc-label"><span class="lang">${esc(c.lang_display)}</span> · ${esc(c.cell_display)}</div>
+              <span class="sc-pc-badge">committed</span>
+            </div>
+            <div class="sc-pc-row"><span class="k">cmd</span><span class="v">${esc(c.failing_command)}</span></div>
+            <div class="sc-pc-row"><span class="k">repo</span><span class="v">${esc(c.repo.split('/')[1] || c.repo)}</span></div>
+            <div class="sc-pc-plan">${esc(c.plan) || '—'}</div>
+            <div class="sc-pc-foot">
+              <span class="sc-pc-cost">${cost} ${tokens}</span>
+              <a class="sc-pc-sha" href="${esc(c.commit_url)}" target="_blank" rel="noopener">${esc(c.commit_short)} &#8599;</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (e) {
+      grid.innerHTML = `<div class="sc-preview-error">Couldn't load live scorecard data (${esc(e.message)}). <a href="/scorecard.html">Open the full scorecard &rarr;</a></div>`;
+    }
+  })();
 </script>
 
-<!-- DEMO -->
-<div class="demo reveal" id="demo">
-  <div class="demo-window">
-    <div class="demo-bar">
-      <span class="demo-dot demo-dot-r"></span>
-      <span class="demo-dot demo-dot-y"></span>
-      <span class="demo-dot demo-dot-g"></span>
-      <span class="demo-title">phalanx &mdash; Agent Console</span>
+<!-- SCORECARD PREVIEW — real PRs closed by the CI Fixer agent -->
+<section class="sc-preview" id="demo">
+  <div class="container reveal">
+    <div class="sc-preview-head">
+      <p class="label"><span class="sc-live-dot"></span> Live from the scorecard</p>
+      <h2 class="title">Real PRs. Real commits.<br>Sandbox-verified before every one.</h2>
+      <p class="subtitle">Each card below is an actual failing CI job from our simulation corpus. The agent diagnosed it, patched it, re-ran the exact failing command in an isolated sandbox, and opened a commit. Every SHA is clickable — see the real diff on GitHub.</p>
     </div>
-    <video autoplay loop muted playsinline>
-      <source src="demo.mp4" type="video/mp4">
-    </video>
+    <div class="sc-preview-grid" id="scPreviewGrid">
+      <div class="sc-preview-loading">loading real runs from /scorecard.json…</div>
+    </div>
+    <div class="sc-preview-cta">
+      <a href="/scorecard.html" class="btn btn-ghost">
+        See all 20 cells
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
   </div>
-</div>
+</section>
 
 <!-- HOW IT WORKS -->
 <section id="how">
