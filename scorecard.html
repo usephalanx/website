@@ -41,6 +41,8 @@
       --amber-dim: rgba(212,168,83,0.10);
       --red: #F7768E;
       --red-dim: rgba(247,118,142,0.10);
+      --plan: #BB9AF7;
+      --max-w: 1100px;
     }
 
     html, body {
@@ -59,26 +61,66 @@
     .wrap {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 48px 24px 80px;
+      padding: 110px 24px 80px;
     }
 
-    /* Nav */
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 48px;
+    /* ── NAV (copied from index.html for visual parity) ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      border-bottom: 1px solid transparent;
+      transition: all 0.3s;
     }
-    .nav .logo {
-      font-weight: 800;
-      font-size: 17px;
-      letter-spacing: -0.01em;
+    nav.scrolled {
+      background: rgba(5,6,8,0.92);
+      backdrop-filter: blur(20px) saturate(180%);
+      border-color: var(--border);
     }
-    .nav .logo a { color: var(--text); text-decoration: none; }
-    .nav .logo .mark { color: var(--blue); }
-    .nav .back {
-      color: var(--text-secondary);
-      font-size: 14px;
+    .nav-inner {
+      max-width: var(--max-w); margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 24px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+    .nav-mark {
+      width: 30px; height: 30px; border-radius: 7px;
+      background: linear-gradient(135deg, var(--blue), var(--plan));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px; color: #fff;
+    }
+    .nav-wordmark { font-weight: 800; font-size: 17px; letter-spacing: 3px; text-transform: uppercase; }
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--text); }
+    .nav-gh {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      background: var(--text); color: var(--bg); text-decoration: none; transition: all 0.2s;
+    }
+    .nav-gh:hover { opacity: 0.88; text-decoration: none; }
+    .nav-gh svg { width: 15px; height: 15px; }
+    .nav-hamburger {
+      display: none; flex-direction: column; justify-content: center; align-items: center;
+      width: 36px; height: 36px; gap: 5px;
+      background: transparent; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; padding: 0;
+    }
+    .nav-hamburger span { display: block; width: 18px; height: 2px; background: var(--text-secondary); transition: all 0.25s; }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu {
+      display: none; position: fixed; top: 65px; left: 0; right: 0; z-index: 99;
+      background: rgba(5,6,8,0.97); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border); padding: 20px 24px 24px;
+    }
+    .mobile-menu.open { display: block; }
+    .mobile-menu ul { list-style: none; margin-bottom: 20px; }
+    .mobile-menu li { border-bottom: 1px solid var(--border); }
+    .mobile-menu li a { display: block; padding: 14px 0; color: var(--text-secondary); text-decoration: none; font-size: 15px; font-weight: 500; }
+    .mobile-menu .mobile-cta {
+      display: flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 10px;
+      font-size: 14px; font-weight: 600; background: var(--text); color: var(--bg);
+      text-decoration: none; justify-content: center;
     }
 
     /* Header */
@@ -272,21 +314,63 @@
     }
     .error { color: var(--red); }
 
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+    }
+
     @media (max-width: 640px) {
       h1 { font-size: 32px; }
-      .wrap { padding: 32px 16px 60px; }
+      .wrap { padding: 90px 16px 60px; }
       .row { grid-template-columns: 80px 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="nav">
-      <div class="logo">
-        <a href="/"><span class="mark">⬡</span> Phalanx</a>
-      </div>
-      <a href="/" class="back">← back to home</a>
+  <nav id="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="nav-mark">P</div>
+        <span class="nav-wordmark">Phalanx</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/#how">Use Cases</a></li>
+        <li><a href="/#formation">Agents</a></li>
+        <li><a href="/#deploy">Deploy</a></li>
+        <li><a href="/#compare">Compare</a></li>
+        <li><a href="/#faq">FAQ</a></li>
+        <li><a href="/scorecard.html" class="active">Scorecard</a></li>
+        <li><a href="/documentation.html">Docs</a></li>
+        <li><a href="/changelog.html">Changelog</a></li>
+        <li><a href="https://github.com/usephalanx/phalanx" target="_blank" class="nav-gh">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a></li>
+      </ul>
+      <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <ul>
+      <li><a href="/#how" class="mobile-nav-link">Use Cases</a></li>
+      <li><a href="/#formation" class="mobile-nav-link">Agents</a></li>
+      <li><a href="/#deploy" class="mobile-nav-link">Deploy</a></li>
+      <li><a href="/#compare" class="mobile-nav-link">Compare</a></li>
+      <li><a href="/#faq" class="mobile-nav-link">FAQ</a></li>
+      <li><a href="/scorecard.html" class="mobile-nav-link">Scorecard</a></li>
+      <li><a href="/documentation.html" class="mobile-nav-link">Docs</a></li>
+      <li><a href="/changelog.html" class="mobile-nav-link">Changelog</a></li>
+    </ul>
+    <a href="https://github.com/usephalanx/phalanx" target="_blank" class="mobile-cta">
+      <svg viewBox="0 0 16 16" fill="currentColor" width="16" height="16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+
+  <div class="wrap">
 
     <h1>Scorecard — live CI-Fixer evidence</h1>
     <p class="tagline">
@@ -422,6 +506,26 @@
     }
 
     main();
+
+    // ── Sticky nav (copied from index.html)
+    const navEl = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      navEl.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // ── Mobile menu
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+    });
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        mobileMenu.classList.remove('open');
+      });
+    });
   </script>
 </body>
 </html>
