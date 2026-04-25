@@ -193,6 +193,56 @@
 
   <div class="timeline">
 
+    <!-- v1.4.0 — CI Fixer v3 multi-agent DAG -->
+    <div class="release">
+      <div class="release-header">
+        <span class="release-version">v1.4.0</span>
+        <span class="release-date">2026-04-25</span>
+        <span class="release-tag tag-feature">Feature</span>
+        <span class="release-tag tag-agent">Agents</span>
+        <span class="release-tag tag-infra">Infrastructure</span>
+      </div>
+      <p class="release-summary">CI Fixer v3 — a 4-agent DAG with on-the-fly sandbox provisioning, iteration on cascading failures, and the first agent commit on a third-party OSS repo (<a href="https://github.com/usephalanx/humanize/pull/2" target="_blank" rel="noopener" class="mono">usephalanx/humanize#2</a>). v2 keeps running for every existing repo; v3 is opt-in per <span class="mono">ci_integrations.cifixer_version='v3'</span> with automatic fallback to v2 if dispatch fails.</p>
+      <ul class="change-list">
+        <li class="change-item">
+          <div class="change-icon icon-new"></div>
+          <div class="change-text"><strong>Multi-agent DAG: SRE Setup → Tech Lead → Engineer → SRE Verify.</strong> Each agent has a single responsibility and writes a structured artifact downstream agents read. Tech Lead investigates with read-only tools (GPT-5.4); Engineer applies the fix and verifies in sandbox (Sonnet); SRE handles env provisioning and full-CI mimicry. Commander orchestrates state, never reads code.</div>
+        </li>
+        <li class="change-item">
+          <div class="change-icon icon-new"></div>
+          <div class="change-text"><strong>On-the-fly sandbox provisioning.</strong> v3 boots a fresh container from a minimal base image per run (e.g. <span class="mono">python:3.11-slim</span>) and installs deps the way the repo asks — no more pre-warmed pool with a year-stale ruff. <span class="mono">env_detector</span> reads <span class="mono">pyproject.toml</span>, <span class="mono">.github/workflows/*.yml</span> and emits an EnvSpec the provisioner consumes.</div>
+        </li>
+        <li class="change-item">
+          <div class="change-icon icon-new"></div>
+          <div class="change-text"><strong>Iteration loop on cascading failures.</strong> When SRE's full-CI verify reports new failures after an Engineer commit, Commander appends another <span class="mono">[techlead, engineer, sre_verify]</span> round (capped at 3 iterations) and feeds the prior failures into the next Tech Lead's prompt. The verification gate held on every iteration in the canary.</div>
+        </li>
+        <li class="change-item">
+          <div class="change-icon icon-new"></div>
+          <div class="change-text"><strong>First commit on an external OSS repo.</strong> <a href="https://github.com/usephalanx/humanize/commit/75b624a" target="_blank" rel="noopener" class="mono">75b624a</a> on usephalanx/humanize PR #2 — a one-line E501 fix on <span class="mono">src/humanize/number.py</span>, sandbox-verified before push. See the <a href="/scorecard.html">public scorecard</a>'s real-world section for the full pipeline trace.</div>
+        </li>
+        <li class="change-item">
+          <div class="change-icon icon-improved"></div>
+          <div class="change-text"><strong>Two-tier integration harness.</strong> <span class="mono">tests/integration/v3_harness/</span> (Tier-1, 51 tests, no Postgres/Docker) covers per-language env_detector contracts (Python full, TS/JS/Java/C# Phase-1) and parser robustness across LLM output shapes. <span class="mono">tests/integration/v3_harness_t2/</span> (Tier-2, 13 tests) catches provider-shape and signature-shadowing regressions via real Postgres + a schema validator that mimics the OpenAI Responses API. Combined ~2s feedback loop.</div>
+        </li>
+        <li class="change-item">
+          <div class="change-icon icon-improved"></div>
+          <div class="change-text"><strong>Tech Lead prompt v3.</strong> Two policy refinements from the canary: <em>(1)</em> <span class="mono">failing_command</span> must be the narrowest command that re-runs the failing check, NOT the CI wrapper (no <span class="mono">prek run</span>, <span class="mono">make ci</span>, etc.) — isolates the fix from sandbox env quirks; <em>(2)</em> when the sandbox can't run CI as configured (e.g. <span class="mono">uv</span> missing), set confidence=0.0 and escalate — never edit <span class="mono">.github/workflows/</span>, <span class="mono">tox.ini</span>, etc. to dodge the env mismatch.</div>
+        </li>
+        <li class="change-item">
+          <div class="change-icon icon-infra"></div>
+          <div class="change-text"><strong>Real-world section on the public scorecard.</strong> <a href="/scorecard.html">scorecard.html</a> now renders external OSS commits in a distinct section above the testbed grid. Generator emits <span class="mono">real_world_runs[]</span> alongside the existing <span class="mono">cells[]</span>; section is hidden until at least one real-world run lands.</div>
+        </li>
+        <li class="change-item">
+          <div class="change-icon icon-infra"></div>
+          <div class="change-text"><strong>Database migration.</strong> Two columns added (zero-downtime, both with server defaults): <span class="mono">work_orders.work_order_type</span> (distinguishes Slack <span class="mono">build</span> from CI <span class="mono">ci_fix</span>) and <span class="mono">ci_integrations.cifixer_version</span> (per-repo v2/v3 selector). Migration <span class="mono">20260423_0001</span>.</div>
+        </li>
+        <li class="change-item">
+          <div class="change-icon icon-fixed"></div>
+          <div class="change-text"><strong>Honest about the rough edges.</strong> Eight bugs surfaced during the canary — six were "v3 forgot something v2's bootstrap glue does" (Celery include, task lifecycle persistence, Sonnet wiring, OpenAI tool_result shape, _audit signature, fix_spec parser); two were prompt issues (the rules above). The harness now catches 6 of 8 locally pre-deploy. The full retro is in the repo at <span class="mono">docs/ci-fixer-v3-canary-retro.md</span>.</div>
+        </li>
+      </ul>
+    </div>
+
     <!-- v1.3.82 -->
     <div class="release">
       <div class="release-header">
