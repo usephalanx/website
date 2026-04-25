@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-23T04:18:19+00:00",
+  "generated_at": "2026-04-25T01:55:15+00:00",
   "summary": {
     "total_cells": 20,
     "committed": 20,
@@ -569,6 +569,43 @@
       "commit_public": true,
       "tokens_used": 73073,
       "cost_usd": 0.2541
+    }
+  ],
+  "real_world_runs": [
+    {
+      "id": "humanize-pr-2-2026-04-24",
+      "label": "First v3 commit on an external OSS repo",
+      "date": "2026-04-24",
+      "upstream_repo": "python-humanize/humanize",
+      "fork_repo": "usephalanx/humanize",
+      "pr_number": 2,
+      "pr_url": "https://github.com/usephalanx/humanize/pull/2",
+      "failing_check": "ruff E501 (long line)",
+      "headline_commit": {
+        "sha": "75b624a",
+        "url": "https://github.com/usephalanx/humanize/commit/75b624a",
+        "files_modified": [
+          "src/humanize/number.py"
+        ],
+        "tokens_used": 13752,
+        "diff_summary": "Replaced a 143-char canary comment with a concise 50-char one."
+      },
+      "pipeline": [
+        {
+          "role": "cifix_sre",
+          "mode": "setup",
+          "summary": "Cloned humanize, env_detector picked python:3.10-slim from requires-python>=3.10, provisioned fresh container with workflow-derived deps."
+        },
+        {
+          "role": "cifix_techlead",
+          "summary": "GPT-5.4 read the CI log, identified ruff E501 at filesize.py line 3, narrowed the failing_command to `ruff check src/humanize/number.py`."
+        },
+        {
+          "role": "cifix_engineer",
+          "summary": "Sonnet edited the line, ran the narrow failing_command in sandbox (exit 0), commit_and_push succeeded."
+        }
+      ],
+      "honest_footnote": "v3's full-CI verify (cifix_sre verify mode) ran the broader workflow and caught cascading failures from upstream's `prek`/`uv` toolchain that our minimal sandbox doesn't ship \u2014 so the system iterated. Iteration 2 over-reached and patched the workflow files themselves, which a real maintainer wouldn't accept. The commit shown here is iteration 1 only \u2014 a clean one-line fix to the actual reported error. The over-reach in iteration 2 is a tracked Phase-2 prompt issue (TL should recognize 'sandbox env mismatch' and escalate instead of editing CI infra). v3's verification gate held both times \u2014 every commit went through a green sandbox run before push."
     }
   ]
 }

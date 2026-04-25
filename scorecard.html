@@ -324,6 +324,123 @@
       .wrap { padding: 90px 16px 60px; }
       .row { grid-template-columns: 80px 1fr; }
     }
+
+    /* Real-world section — distinct visual treatment from the testbed grid. */
+    .rw-section {
+      margin: 0 0 56px;
+      padding: 28px 28px 24px;
+      background: linear-gradient(135deg, rgba(122,162,247,0.06), rgba(187,154,247,0.04));
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--blue);
+      border-radius: 12px;
+    }
+    .rw-banner { margin-bottom: 24px; }
+    .rw-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--blue);
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    .rw-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .rw-sub {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.55;
+      max-width: 720px;
+    }
+    .rw-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px;
+      margin-bottom: 14px;
+    }
+    .rw-card-head {
+      display: flex; align-items: baseline; gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .rw-card-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .rw-card-date {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+    .rw-meta {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 6px 16px;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+    .rw-meta .k {
+      color: var(--text-muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .rw-meta .v {
+      color: var(--text-secondary);
+      word-break: break-word;
+    }
+    .rw-meta .v.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; color: var(--text); font-size: 12.5px; }
+    .rw-meta .v a { color: var(--blue); }
+    .rw-pipeline {
+      margin: 14px 0;
+      padding: 14px 16px;
+      background: var(--bg);
+      border-left: 2px solid var(--blue);
+      border-radius: 4px;
+    }
+    .rw-pipeline-step { font-size: 13px; line-height: 1.55; margin-bottom: 8px; color: var(--text-secondary); }
+    .rw-pipeline-step:last-child { margin-bottom: 0; }
+    .rw-pipeline-step strong {
+      color: var(--text);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+      font-weight: 600;
+      margin-right: 6px;
+    }
+    .rw-honest {
+      margin-top: 16px;
+      padding: 14px 16px;
+      background: var(--amber-dim);
+      border-left: 2px solid var(--amber);
+      border-radius: 4px;
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+    .rw-honest .label {
+      color: var(--amber);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 6px;
+    }
+    .grid-heading {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 16px;
+      letter-spacing: -0.01em;
+    }
   </style>
 </head>
 <body>
@@ -382,6 +499,20 @@
 
     <div id="summary" class="summary"><div class="metric"><div class="value">loading…</div></div></div>
 
+    <!-- Real-world canary: agent fixes on EXTERNAL repos, not our testbeds.
+         Hidden until /scorecard.json supplies a non-empty real_world_runs[]. -->
+    <section id="rwSection" class="rw-section" style="display:none;">
+      <div class="rw-banner">
+        <span class="rw-badge">Real-world</span>
+        <h2 class="rw-title">External OSS PRs the agent has closed end-to-end</h2>
+        <p class="rw-sub">Not our own testbed. Public, third-party repositories with their own CI,
+          their own maintainers, their own dependencies. Every commit linked below was made by the
+          agent through the v3 multi-agent DAG.</p>
+      </div>
+      <div id="rwList"></div>
+    </section>
+
+    <h2 class="grid-heading">Internal corpus — 20 fixture cells</h2>
     <div id="grid" class="grid"></div>
 
     <div id="errbox"></div>
@@ -489,6 +620,39 @@
       `;
     }
 
+    function rwCardHtml(r) {
+      const c = r.headline_commit || {};
+      const files = (c.files_modified || []).map(esc).join(', ') || '—';
+      const tokens = typeof c.tokens_used === 'number' ? c.tokens_used.toLocaleString() : '—';
+      const pipelineHtml = (r.pipeline || []).map(p =>
+        `<div class="rw-pipeline-step"><strong>${esc(p.role)}${p.mode ? ' · ' + esc(p.mode) : ''}</strong>${esc(p.summary)}</div>`
+      ).join('');
+      return `
+        <div class="rw-card">
+          <div class="rw-card-head">
+            <div class="rw-card-label">${esc(r.label)}</div>
+            <div class="rw-card-date">${esc(r.date)}</div>
+          </div>
+          <div class="rw-meta">
+            <div class="k">Upstream</div>
+            <div class="v mono"><a href="https://github.com/${esc(r.upstream_repo)}" target="_blank" rel="noopener">${esc(r.upstream_repo)}</a></div>
+            <div class="k">PR</div>
+            <div class="v mono"><a href="${esc(r.pr_url)}" target="_blank" rel="noopener">${esc(r.fork_repo)}#${esc(r.pr_number)}</a></div>
+            <div class="k">Failing check</div>
+            <div class="v">${esc(r.failing_check)}</div>
+            <div class="k">Files modified</div>
+            <div class="v mono">${files}</div>
+            <div class="k">Tokens used</div>
+            <div class="v mono">${tokens}</div>
+            <div class="k">Commit</div>
+            <div class="v mono"><a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.sha)} ↗</a> — ${esc(c.diff_summary || '')}</div>
+          </div>
+          <div class="rw-pipeline">${pipelineHtml}</div>
+          ${r.honest_footnote ? `<div class="rw-honest"><div class="label">Honest about the rough edges</div>${esc(r.honest_footnote)}</div>` : ''}
+        </div>
+      `;
+    }
+
     async function main() {
       $('summary').innerHTML = `<div class="loading">loading scorecard…</div>`;
       let doc;
@@ -502,6 +666,14 @@
         return;
       }
       $('summary').innerHTML = summaryHtml(doc.summary);
+
+      // Real-world section: visible only when the JSON has at least one entry.
+      const rw = Array.isArray(doc.real_world_runs) ? doc.real_world_runs : [];
+      if (rw.length > 0) {
+        $('rwList').innerHTML = rw.map(rwCardHtml).join('');
+        document.getElementById('rwSection').style.display = '';
+      }
+
       $('grid').innerHTML = doc.cells.map(cardHtml).join('');
     }
 
